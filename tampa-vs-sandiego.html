@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tampa Bay × San Diego — The Map Nobody Made (Until Now)</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sand: #F5EDD6;
+    --ocean: #1A4A6B;
+    --sunset: #E8633A;
+    --coral: #F2956A;
+    --palm: #2D6A4F;
+    --sky: #87CEEB;
+    --gold: #D4A017;
+    --cream: #FDF8EE;
+    --dark: #1C1C1C;
+    --muted: #8A7F72;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--cream);
+    font-family: 'Space Mono', monospace;
+    color: var(--dark);
+    width: 900px;
+    margin: 0 auto;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--ocean);
+    padding: 60px 60px 50px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .header::before {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 6px;
+    background: repeating-linear-gradient(90deg, var(--sunset) 0px, var(--sunset) 40px, var(--gold) 40px, var(--gold) 80px, var(--coral) 80px, var(--coral) 120px);
+  }
+
+  .header-eyebrow {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--coral);
+    margin-bottom: 16px;
+  }
+
+  .header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 64px;
+    font-weight: 900;
+    color: var(--sand);
+    line-height: 1.0;
+    margin-bottom: 10px;
+  }
+
+  .header h1 span {
+    color: var(--sunset);
+    font-style: italic;
+  }
+
+  .header-sub {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    color: var(--sky);
+    margin-top: 18px;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+    max-width: 600px;
+    line-height: 1.6;
+  }
+
+  .header-wave {
+    position: absolute;
+    top: 20px;
+    right: 50px;
+    font-size: 120px;
+    opacity: 0.07;
+    line-height: 1;
+  }
+
+  /* LEGEND BAR */
+  .legend-bar {
+    background: var(--dark);
+    padding: 14px 60px;
+    display: flex;
+    gap: 40px;
+    align-items: center;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #fff;
+  }
+
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+
+  .dot-sd { background: var(--coral); }
+  .dot-tb { background: var(--sky); }
+  .dot-arrow { background: var(--gold); border-radius: 0; transform: rotate(45deg); }
+
+  /* SECTION HEADERS */
+  .section-label {
+    background: var(--sunset);
+    padding: 10px 60px;
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: white;
+  }
+
+  /* COMPARISON ROWS */
+  .comparisons {
+    padding: 0 60px;
+  }
+
+  .comp-row {
+    display: grid;
+    grid-template-columns: 1fr 60px 1fr;
+    align-items: center;
+    padding: 18px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.07);
+    gap: 0;
+  }
+
+  .comp-row:last-child {
+    border-bottom: none;
+  }
+
+  .comp-row.featured {
+    background: linear-gradient(135deg, rgba(232,99,58,0.06), rgba(135,206,235,0.06));
+    margin: 0 -20px;
+    padding: 22px 20px;
+    border-radius: 4px;
+    border-bottom: none;
+    margin-bottom: 2px;
+  }
+
+  .city-block {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .city-block.right {
+    text-align: right;
+    align-items: flex-end;
+  }
+
+  .city-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 19px;
+    font-weight: 700;
+    color: var(--dark);
+    line-height: 1.1;
+  }
+
+  .city-name.sd { color: var(--sunset); }
+  .city-name.tb { color: var(--ocean); }
+
+  .comp-row.featured .city-name.sd { font-size: 22px; }
+  .comp-row.featured .city-name.tb { font-size: 22px; }
+
+  .city-desc {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    line-height: 1.5;
+    max-width: 280px;
+    font-style: italic;
+  }
+
+  .city-block.right .city-desc {
+    text-align: right;
+    margin-left: auto;
+  }
+
+  .city-tag {
+    display: inline-block;
+    background: var(--sand);
+    border-radius: 2px;
+    padding: 2px 7px;
+    font-family: 'Syne', sans-serif;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 2px;
+    font-weight: 600;
+  }
+
+  .arrow-col {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: var(--gold);
+    font-weight: 900;
+    font-family: 'Syne', sans-serif;
+  }
+
+  /* FREEWAY SECTION */
+  .freeway-section {
+    background: var(--dark);
+    padding: 40px 60px;
+    margin-top: 10px;
+  }
+
+  .freeway-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--sand);
+    margin-bottom: 6px;
+  }
+
+  .freeway-title span { color: var(--sunset); font-style: italic; }
+
+  .freeway-sub {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+
+  .freeway-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+  }
+
+  .freeway-card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 4px;
+    padding: 20px 18px;
+  }
+
+  .freeway-pair {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .freeway-badge {
+    background: var(--sunset);
+    color: white;
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 800;
+    padding: 4px 10px;
+    border-radius: 2px;
+    letter-spacing: 1px;
+  }
+
+  .freeway-badge.blue { background: var(--ocean); }
+
+  .freeway-eq {
+    color: var(--gold);
+    font-size: 16px;
+  }
+
+  .freeway-note {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: rgba(255,255,255,0.5);
+    line-height: 1.5;
+    font-style: italic;
+  }
+
+  /* VIBE TIER */
+  .tier-section {
+    padding: 40px 60px;
+    background: var(--sand);
+  }
+
+  .tier-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .tier-title span { color: var(--sunset); font-style: italic; }
+
+  .tier-sub {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+
+  .tier-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+
+  .tier-card {
+    background: white;
+    border-radius: 4px;
+    padding: 16px 14px;
+    border-top: 4px solid var(--sunset);
+  }
+
+  .tier-card.old-money { border-top-color: var(--gold); }
+  .tier-card.artsy { border-top-color: var(--palm); }
+  .tier-card.burbs { border-top-color: var(--sky); }
+  .tier-card.real-out { border-top-color: var(--muted); }
+
+  .tier-label {
+    font-family: 'Syne', sans-serif;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    color: var(--muted);
+  }
+
+  .tier-city {
+    font-family: 'Playfair Display', serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--dark);
+    line-height: 1.4;
+  }
+
+  .tier-city span {
+    display: block;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  /* QUOTE PULL */
+  .pull-quote {
+    background: var(--ocean);
+    padding: 40px 60px;
+    text-align: center;
+  }
+
+  .pull-quote blockquote {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    font-style: italic;
+    color: var(--sand);
+    line-height: 1.5;
+    max-width: 680px;
+    margin: 0 auto;
+  }
+
+  .pull-quote blockquote strong {
+    color: var(--sunset);
+    font-style: normal;
+  }
+
+  /* FOOTER */
+  .footer {
+    background: var(--dark);
+    padding: 24px 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .footer-left {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    line-height: 1.6;
+  }
+
+  .footer-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 900;
+    color: var(--sand);
+    letter-spacing: -1px;
+  }
+
+  .footer-logo span { color: var(--sunset); }
+
+  .divider {
+    height: 2px;
+    background: repeating-linear-gradient(90deg, var(--sunset) 0, var(--sunset) 30px, transparent 30px, transparent 40px);
+    margin: 0 60px;
+  }
+
+  .section-gap {
+    height: 8px;
+    background: var(--cream);
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-wave">🌊</div>
+  <div class="header-eyebrow">The Unofficial Relocation Decoder</div>
+  <h1>Tampa Bay<br><span>is just San Diego</span><br>with humidity.</h1>
+  <p class="header-sub">A neighborhood-by-neighborhood translation guide for anyone who grew up in SoCal and ended up in Florida — or is trying to explain Tampa to someone who did.</p>
+</div>
+
+<!-- LEGEND -->
+<div class="legend-bar">
+  <div class="legend-item"><div class="legend-dot dot-sd"></div> San Diego</div>
+  <div class="legend-item"><div class="legend-dot dot-tb"></div> Tampa Bay</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--gold);"></div> Direct equivalent</div>
+  <div class="legend-item" style="margin-left:auto; color: rgba(255,255,255,0.4); font-size:9px;">FOR INFORMATIONAL USE ONLY. NO REFUNDS.</div>
+</div>
+
+<!-- SECTION: THE MONEY NEIGHBORHOODS -->
+<div class="section-label">① The Money Neighborhoods</div>
+<div class="comparisons">
+  <div class="comp-row featured">
+    <div class="city-block">
+      <span class="city-name sd">La Jolla</span>
+      <span class="city-desc">Old money. Waterfront. Brunch. People who "made it" quietly.</span>
+      <span class="city-tag">anchor reference</span>
+    </div>
+    <div class="arrow-col">≡</div>
+    <div class="city-block right">
+      <span class="city-name tb">South Tampa</span>
+      <span class="city-desc">Hyde Park, Palma Ceia, Davis Islands. Bayshore Blvd. Same energy, more humidity.</span>
+      <span class="city-tag">anchor reference</span>
+    </div>
+  </div>
+
+  <div class="comp-row">
+    <div class="city-block">
+      <span class="city-name sd">Del Mar / Rancho Santa Fe</span>
+      <span class="city-desc">Old money that doesn't announce itself. Waterfront. Exclusive feel without the flash.</span>
+    </div>
+    <div class="arrow-col">→</div>
+    <div class="city-block right">
+      <span class="city-name tb">Belleair / Belleair Beach</span>
+      <span class="city-desc">Small, tucked away, waterfront. Very exclusive feel. Nobody's posting about it.</span>
+    </div>
+  </div>
+
+  <div class="comp-row">
+    <div class="city-block">
+      <span class="city-name sd">Coronado</span>
+      <span class="city-desc">Small, charming, golf cart culture, stunning. Bridge access only. Elite.</span>
+    </div>
+    <div class="arrow-col">→</div>
+    <div class="city-block right">
+      <span class="city-name tb">Anna Maria Island</span>
+      <span class="city-desc">Old Florida money. Golf carts. Barrier island perfection. Bradenton's saving grace.</span>
+    </div>
+  </div>
+
+  <div class="comp-row">
+    <div class="city-block">
+      <span class="city-name sd">La Jolla (retirement wave)</span>
+      <span class="city-desc">Arts, culture, waterfront. Old wealth with a young pro wave moving in.</span>
+    </div>
+    <div class="arrow-col">→</div>
+    <div class="city-block right">
+      <span class="city-name tb">Sarasota</span>
+      <span class="city-desc">Siesta Key, arts scene, Ringling money. The sleeper pick if you're not tied to Tampa.</span>
+    </div>
+  </div>
+</div>
+
+<div class="section-gap"></div>
+
+<!-- SECTION: THE COOL NEIGHBORHOODS -->
+<div class="section-label">② The "Actually Has a Personality" Zone</div>
+<div class="comparisons">
+  <div class="comp-row featured">
+    <div class="city-block">
+      <span class="city-name sd">North Park / Little Italy</span>
+      <span class="city-desc">Walkable, artsy, craft beer and murals. Real identity. Snell Isle pushes toward Del Mar money.</span>
+    </div>
+    <div class="arrow-col">≡</div>
+    <div class="city-block right">
+      <span class="city-name tb">St. Pete</span>
+      <span class="city-desc">Most underrated city in Florida. Old Northeast, Coffee Pot Bayou, downtown mural scene. A full identity.</span>
+    </div>
+  </div>
+
+  <div class="comp-row">
+    <div class="city-block">
+      <span class="city-name sd">Encinitas</span>
+      <span class="city-desc">Charming, walkable Main Street, craft brewery scene, coastal without touristy.</span>
+    </div>
+    <div class="arrow-col">→</div>
+    <div class="city-block right">
+      <span class="city-name tb">Dunedin</span>
+      <span class="city-desc">Found it before it got trendy. Main Street, brewery culture, the most Encinitas place in Florida.</span>
+    </div>
+  </div>
+
+  <div class="comp-row">
+    <div class="city-block">
+      <span class="city-name sd">Ocean Beach (OB)</span>
+      <span class="city-desc">Quirky, artsy, local, slightly funky. Not trying to impress anyone.</span>
+    </div>
+    <div class="arrow-col">→</div>
+    <div class="city-block right">
+      <span class="city-name tb">Gulfport</span>
+      <span class="city-desc">People who live here are intentional about it. Great bars, great people, zero hype. Pure OB.</span>
+    </div>
+  </div>
+
+  <div class="comp-row">
+    <div class="city-block">
+      <span class="city-name sd">Solana Beach</span>
+      <span class="city-desc">Quaint, waterfront, found it before it was trendy.</span>
+    </div>
+    <div class="arrow-col">→</div>
+    <div class="city-block right">
+      <span class="city-name tb">Safety Harbor</span>
+      <span class="city-desc">Waterfront, local restaurants, slightly under the radar. For now.</span>
+    </div>
+  </div>
+
+  <div class="comp-row">
+    <div class="city-block">
+      <span class="city-name sd">East Village</span>
+      <span class="city-desc">Developer-built neighborhood that actually worked. Mixed-use, curated, walkable-ish.</span>
+    </div>
+    <div class="arrow-col">→</div>
+    <div class="city-block right">
+      <span class="city-name tb">Midtown Tampa</span>
+      <span class="city-desc">Whole Foods, Armature Works, mixed-use done right. Someone planned this and it slapped.</span>
+    </div>
+  </div>
+
+  <div class="comp-row">
+    <div class="city-block">
+      <span class="city-name sd">Old Town Scottsdale*</span>
+      <span class="city-desc">Unique cultural identity. Touristy but authentic.</span>
+      <span class="city-tag">*AZ reference</span>
+    </div>
+    <div class="arrow-col">→</div>
+    <div class="city-block right">
+      <span class="city-name tb">Tarpon Springs</span>
+      <span class="city-desc">Greek heritage, sponge docks, full cultural identity. Older demo but genuinely unique.</span>
+    </div>
+  </div>
+</div>
+
+<div class="section-gap"></div>
+
+<!-- SECTION: BEACH TOWNS -->
+<div class="section-label">③ The Beach Towns</div>
+<div class="comparisons">
+  <div class="comp-row">
+    <div class="city-block">
+      <span class="city-name sd">Pacific Beach (PB)</span>
+      <span class="city-desc">Tourist-facing, Spring Break energy. Fun but not aspirational.</span>
+    </div>
+    <div class="arrow-col">→</div>
+    <div class="city-block right">
+      <span class="city-name tb">Clearwater Beach</span>
+      <span class="city-desc">Same exact vibe. Great strip behind the tourist layer. Know where to look.</span>
+    </div>
+  </div>
+
+  <div class="comp-row">
+    <div class="city-block">
+      <span class="city-name sd">Mission Beach</span>
+      <span class="city-desc">Narrow barrier island, beach bars, walkable. Classic SoCal beach town layout.</span>
+    </div>
+    <div class="arrow-col">→</div>
+    <div class="city-block right">
+      <span class="city-name tb">St. Pete Beach / Pass-a-Grille</span>
+      <span class="city-desc">Same energy. Pass-a-Grille specifically = southern tip gem, quiet, tucked away.</span>
+    </div>
+  </div>
+
+  <div class="comp-row">
+    <div class="city-block">
+      <span class="city-name sd">OB meets Encinitas</span>
+      <span class="city-desc">Low key, local-ish, residential beach community.</span>
+    </div>
+    <div class="arrow-col">→</div>
+    <div class="city-block right">
+      <span class="city-name tb">Indian Rocks Beach</span>
+      <span class="city-desc">Not Spring Break chaos. Actual neighbors. People who live on the beach and act normal.</span>
+    </div>
+  </div>
+</div>
+
+<div class="section-gap"></div>
+
+<!-- SECTION: BURBS -->
+<div class="section-label">④ The Burbs (Life Stage Decisions)</div>
+<div class="comparisons">
+  <div class="comp-row featured">
+    <div class="city-block">
+      <span class="city-name sd">Chandler / Gilbert*</span>
+      <span class="city-desc">Master-planned. New construction. Good schools. Target every half mile.</span>
+      <span class="city-tag">*AZ reference</span>
+    </div>
+    <div class="arrow-col">≡</div>
+    <div class="city-block right">
+      <span class="city-name tb">Wesley Chapel</span>
+      <span class="city-desc">You're not choosing it for the scene. You're starting a family and commuting toward everything.</span>
+    </div>
+  </div>
+
+  <div class="comp-row featured">
+    <div class="city-block">
+      <span class="city-name sd">DC Ranch / Scottsdale*</span>
+      <span class="city-desc">Master-planned but actually nice master-planned. Curated, upscale, lifestyle-oriented.</span>
+      <span class="city-tag">*AZ reference</span>
+    </div>
+    <div class="arrow-col">≡</div>
+    <div class="city-block right">
+      <span class="city-name tb">Lakewood Ranch</span>
+      <span class="city-desc">What Chandler wishes it was. Between Bradenton and Sarasota. Growing fast, stays curated.</span>
+    </div>
+  </div>
+
+  <div class="comp-row">
+    <div class="city-block">
+      <span class="city-name sd">Poway / Scripps Ranch</span>
+      <span class="city-desc">Solid, good schools, people who did their research. Not flashy but not boring.</span>
+    </div>
+    <div class="arrow-col">→</div>
+    <div class="city-block right">
+      <span class="city-name tb">Palm Harbor</span>
+      <span class="city-desc">Very livable. For people who chose correctly without needing credit for it.</span>
+    </div>
+  </div>
+
+  <div class="comp-row">
+    <div class="city-block">
+      <span class="city-name sd">Ahwatukee*</span>
+      <span class="city-desc">Planned community. Family-oriented. Clean. Solid.</span>
+      <span class="city-tag">*AZ reference</span>
+    </div>
+    <div class="arrow-col">→</div>
+    <div class="city-block right">
+      <span class="city-name tb">Westchase</span>
+      <span class="city-desc">Same energy. Not a flex, but not a mistake. Functional suburb done right.</span>
+    </div>
+  </div>
+
+  <div class="comp-row">
+    <div class="city-block">
+      <span class="city-name sd">Rancho Bernardo / Poway North</span>
+      <span class="city-desc">Further out, bigger lots, older money mixed with newer families.</span>
+    </div>
+    <div class="arrow-col">→</div>
+    <div class="city-block right">
+      <span class="city-name tb">Land O Lakes / Lutz</span>
+      <span class="city-desc">Bigger lots, older money mixed with new. Made peace with the commute and never looked back.</span>
+    </div>
+  </div>
+
+  <div class="comp-row">
+    <div class="city-block">
+      <span class="city-name sd">San Marcos</span>
+      <span class="city-desc">Growing fast, university adjacent, diverse, in that in-between glow-up phase.</span>
+    </div>
+    <div class="arrow-col">→</div>
+    <div class="city-block right">
+      <span class="city-name tb">New Tampa / USF Corridor</span>
+      <span class="city-desc">Cal State = USF. Not as far gone as Wesley Chapel. Becoming something. Watch this space.</span>
+    </div>
+  </div>
+
+  <div class="comp-row">
+    <div class="city-block">
+      <span class="city-name sd">Alpine</span>
+      <span class="city-desc">Bigger lots, rural feel, horse property. Fully committed to the commute.</span>
+    </div>
+    <div class="arrow-col">→</div>
+    <div class="city-block right">
+      <span class="city-name tb">Lithia / Fishhawk</span>
+      <span class="city-desc">Lots, land, horses. Conservative. Space over access. The commute is the price and they pay it gladly.</span>
+    </div>
+  </div>
+
+  <div class="comp-row">
+    <div class="city-block">
+      <span class="city-name sd">Arcadia horse property*</span>
+      <span class="city-desc">Quiet Scottsdale money. Land. Big lots.</span>
+      <span class="city-tag">*AZ reference</span>
+    </div>
+    <div class="arrow-col">→</div>
+    <div class="city-block right">
+      <span class="city-name tb">Odessa</span>
+      <span class="city-desc">Bigger lots, quiet money, people with land who don't need to explain it.</span>
+    </div>
+  </div>
+</div>
+
+<div class="section-gap"></div>
+
+<!-- SECTION: THE REST -->
+<div class="section-label">⑤ Functional, Affordable, Just Exists</div>
+<div class="comparisons">
+  <div class="comp-row">
+    <div class="city-block">
+      <span class="city-name sd">La Mesa</span>
+      <span class="city-desc">Grit, character, older neighborhoods, working class backbone. But saved by proximity.</span>
+    </div>
+    <div class="arrow-col">→</div>
+    <div class="city-block right">
+      <span class="city-name tb">Bradenton</span>
+      <span class="city-desc">Whatever. But Anna Maria Island is attached to it, so. Automatically redeemed.</span>
+    </div>
+  </div>
+
+  <div class="comp-row">
+    <div class="city-block">
+      <span class="city-name sd">Santee / El Cajon</span>
+      <span class="city-desc">Working class. Strip malls. Auto shops. Not a destination.</span>
+    </div>
+    <div class="arrow-col">→</div>
+    <div class="city-block right">
+      <span class="city-name tb">Pinellas Park</span>
+      <span class="city-desc">You're passing through it. Good people, zero pretension, nobody putting it on a highlight reel.</span>
+    </div>
+  </div>
+
+  <div class="comp-row">
+    <div class="city-block">
+      <span class="city-name sd">Vista</span>
+      <span class="city-desc">Inland, agricultural roots, working class, Latino community. The freeway exit.</span>
+    </div>
+    <div class="arrow-col">→</div>
+    <div class="city-block right">
+      <span class="city-name tb">Plant City</span>
+      <span class="city-desc">Strawberry Festival is their whole personality. Functional. Nobody's bragging.</span>
+    </div>
+  </div>
+
+  <div class="comp-row">
+    <div class="city-block">
+      <span class="city-name sd">Mesa*</span>
+      <span class="city-desc">Affordable. Sprawling. Functional. Not a vibe destination.</span>
+      <span class="city-tag">*AZ reference</span>
+    </div>
+    <div class="arrow-col">→</div>
+    <div class="city-block right">
+      <span class="city-name tb">Brandon / Riverview</span>
+      <span class="city-desc">Same energy, different humidity level.</span>
+    </div>
+  </div>
+</div>
+
+<div class="section-gap"></div>
+
+<!-- SECTION: OPTED OUT -->
+<div class="section-label">⑥ Fully Opted Out of Society</div>
+<div class="comparisons">
+  <div class="comp-row">
+    <div class="city-block">
+      <span class="city-name sd">Ramona / Borrego Springs</span>
+      <span class="city-desc">You've left the metro. Rural. Day trip energy for others, full commitment for residents.</span>
+    </div>
+    <div class="arrow-col">→</div>
+    <div class="city-block right">
+      <span class="city-name tb">Zephyrhills</span>
+      <span class="city-desc">Known for water and skydiving. Retiree heavy. You made a very specific choice and you're at peace.</span>
+    </div>
+  </div>
+
+  <div class="comp-row">
+    <div class="city-block">
+      <span class="city-name sd">Julian</span>
+      <span class="city-desc">Apple pie, antique shops, Sunday drive destination. Nobody lives there by accident.</span>
+    </div>
+    <div class="arrow-col">→</div>
+    <div class="city-block right">
+      <span class="city-name tb">Dade City / Brooksville</span>
+      <span class="city-desc">Antique malls. Rolling hills (rare in FL). You opted out fully. Good for you honestly.</span>
+    </div>
+  </div>
+
+  <div class="comp-row">
+    <div class="city-block">
+      <span class="city-name sd">Flagstaff*</span>
+      <span class="city-desc">College town. Outdoorsy. Artsy. Liberal pocket in a conservative state. You go there on purpose.</span>
+      <span class="city-tag">*AZ reference</span>
+    </div>
+    <div class="arrow-col">→</div>
+    <div class="city-block right">
+      <span class="city-name tb">Gainesville</span>
+      <span class="city-desc">UF energy. Same spiritual frequency as Flagstaff. Great if you chose it. Not a career hub.</span>
+    </div>
+  </div>
+</div>
+
+<div class="section-gap"></div>
+
+<!-- FREEWAYS -->
+<div class="freeway-section">
+  <div class="freeway-title">The <span>Freeway</span> Map</div>
+  <div class="freeway-sub">Because of course the roads map too</div>
+
+  <div class="freeway-grid">
+    <div class="freeway-card">
+      <div class="freeway-pair">
+        <span class="freeway-badge">I-8</span>
+        <span class="freeway-eq">≡</span>
+        <span class="freeway-badge blue">I-275</span>
+      </div>
+      <div class="freeway-note">East-west spine. Cross it and you're at the beach in a different world. Same psychological effect every time.</div>
+    </div>
+    <div class="freeway-card">
+      <div class="freeway-pair">
+        <span class="freeway-badge">I-15</span>
+        <span class="freeway-eq">≡</span>
+        <span class="freeway-badge blue">I-75</span>
+      </div>
+      <div class="freeway-note">Inland north-south. Less personality, more utility. Gets you to Wesley Chapel the same way the 15 gets you to Miramar.</div>
+    </div>
+    <div class="freeway-card">
+      <div class="freeway-pair">
+        <span class="freeway-badge">Coronado Br.</span>
+        <span class="freeway-eq">≡</span>
+        <span class="freeway-badge blue">The Bridges</span>
+      </div>
+      <div class="freeway-note">Howard Frankland / Gandy / Skyway. Crossing water to get somewhere cooler. Every single time.</div>
+    </div>
+  </div>
+</div>
+
+<!-- VIBE TIERS -->
+<div class="tier-section">
+  <div class="tier-title">The <span>Vibe Tier</span> Summary</div>
+  <div class="tier-sub">Quick-reference for explaining Tampa Bay to anyone</div>
+  <div class="tier-grid">
+    <div class="tier-card old-money">
+      <div class="tier-label">💛 Old Money</div>
+      <div class="tier-city">South Tampa<span>Hyde Park · Davis Islands</span></div>
+      <div class="tier-city" style="margin-top:8px">Belleair<span>For the actually quiet rich</span></div>
+      <div class="tier-city" style="margin-top:8px">Anna Maria Is.<span>Bradenton's redemption arc</span></div>
+    </div>
+    <div class="tier-card artsy">
+      <div class="tier-label">🎨 Has a Soul</div>
+      <div class="tier-city">St. Pete<span>The real one</span></div>
+      <div class="tier-city" style="margin-top:8px">Dunedin<span>Encinitas energy</span></div>
+      <div class="tier-city" style="margin-top:8px">Gulfport<span>OB in Florida</span></div>
+    </div>
+    <div class="tier-card burbs">
+      <div class="tier-label">🏡 Life Stage Move</div>
+      <div class="tier-city">Lakewood Ranch<span>Upscale master plan</span></div>
+      <div class="tier-city" style="margin-top:8px">Wesley Chapel<span>The burbs. Intentional.</span></div>
+      <div class="tier-city" style="margin-top:8px">Palm Harbor<span>Did the research</span></div>
+    </div>
+    <div class="tier-card real-out">
+      <div class="tier-label">🌿 Opted Out</div>
+      <div class="tier-city">Zephyrhills<span>Peace found</span></div>
+      <div class="tier-city" style="margin-top:8px">Dade City<span>Antiques & rolling hills</span></div>
+      <div class="tier-city" style="margin-top:8px">Gainesville<span>Flagstaff of FL</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- PULL QUOTE -->
+<div class="pull-quote">
+  <blockquote>"Both cities have that thing where people move there and just <strong>never leave.</strong> The weather, the water, the access — Tampa Bay just doesn't get enough credit for how layered it is."</blockquote>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <div class="footer-left">
+    Tampa Bay × San Diego<br>
+    Neighborhood Decoder v1.0<br>
+    Unofficial · Unsolicited · Accurate
+  </div>
+  <div class="footer-logo">Tampa<span>≡</span>SD</div>
+</div>
+
+</body>
+</html>
